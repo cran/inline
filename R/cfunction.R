@@ -49,7 +49,8 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
   }
 
   if (Rcpp) {
-      if (!requireNamespace(Rcpp)) stop("Rcpp cannot be loaded, install it or use the default Rcpp=FALSE")
+      if (!requireNamespace("Rcpp", quietly=TRUE))
+          stop("Rcpp cannot be loaded, install it or use the default Rcpp=FALSE", call.=FALSE)
       cxxargs <- c(Rcpp:::RcppCxxFlags(), cxxargs)	# prepend information from Rcpp
   }
   if (length(cppargs) != 0) {
@@ -219,14 +220,14 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
     ## create .C/.Call function call that will be added to 'fn'
     if (convention == ".Call") {
       body <- quote( CONVENTION("EXTERNALNAME", ARG) )[ c(1:2, rep(3, length(sig[[i]]))) ]
-      for ( j in seq(along = sig[[i]]) ) body[[j+2]] <- as.name(names(sig[[i]])[j])
+      for ( j in seq_along(sig[[i]]) ) body[[j+2]] <- as.name(names(sig[[i]])[j])
     }
     else {
       body <- quote( CONVENTION("EXTERNALNAME", as.logical(ARG), as.integer(ARG),
                     as.double(ARG), as.complex(ARG), as.character(ARG),
           			    as.raw(ARG), as.double(ARG)) )[ c(1:2,types[[i]]+2) ]
       names(body) <- c( NA, "", names(sig[[i]]) )
-      for ( j in seq(along = sig[[i]]) ) body[[j+2]][[2]] <- as.name(names(sig[[i]])[j])
+      for ( j in seq_along(sig[[i]]) ) body[[j+2]][[2]] <- as.name(names(sig[[i]])[j])
 ## OLD VERSION -- does not work for lists of functions
 #      body <- quote( CONVENTION("EXTERNALNAME", as.logical(ARG), as.integer(ARG),
 #                    as.double(ARG), as.complex(ARG), as.character(ARG),
