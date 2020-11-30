@@ -16,7 +16,7 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
                       language=c("C++", "C", "Fortran", "F95", "ObjectiveC", "ObjectiveC++"),
                       verbose=FALSE, convention=c(".Call", ".C", ".Fortran"), Rcpp=FALSE,
                       cppargs=character(), cxxargs=character(), libargs=character(),
-                      dim = NULL, implicit = NULL, module = NULL) {
+                      dim = NULL, implicit = NULL, module = NULL, name = NULL) {
 
  if (missing (convention) & !missing(language))
       convention <- switch (EXPR = language, "Fortran" = ".Fortran", "F95" = ".Fortran", ".C" = ".C", ObjectiveC = ".Call", "ObjectiveC++" = ".Call", "C++" = ".Call")
@@ -31,11 +31,16 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
 
   f <- basename(tempfile())
 
+  if (is.null(name)) {
+    name <- f
+  }
+
   if ( !is.list(sig) ) {
     sig <- list(sig)
-    names(sig) <- f
-    names(body) <- f
+    names(sig) <- name
+    names(body) <- name
   }
+
   if( length(sig) != length(body) )
     stop("mismatch between the number of functions declared in 'sig' and the number of function bodies provided in 'body'")
 
@@ -51,7 +56,9 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
   if (Rcpp) {
       if (!requireNamespace("Rcpp", quietly=TRUE))
           stop("Rcpp cannot be loaded, install it or use the default Rcpp=FALSE", call.=FALSE)
-      cxxargs <- c(Rcpp:::RcppCxxFlags(), cxxargs)	# prepend information from Rcpp
+      rcppdir <- system.file("include", package="Rcpp")
+      if (.Platform$OS.type == "windows") rcppdir <- utils::shortPathName(normalizePath(rcppdir))
+      cxxargs <- c(paste("-I", rcppdir, sep=""), cxxargs)	# prepend information from Rcpp
   }
   if (length(cppargs) != 0) {
       args <- paste(cppargs, collapse=" ")
@@ -188,10 +195,14 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
   ## WRITE AND COMPILE THE CODE
   libLFile <- compileCode(f, code, language, verbose)
 
+
   ## SET A FINALIZER TO PERFORM CLEANUP
+  # Make a copy of libLFile, as we may overwrite it later in writeDynLib(), and
+  # we don't want the finalizer to remove the new libLFile
+  libLFile_orig <- libLFile
   cleanup <- function(env) {
-    if ( f %in% names(getLoadedDLLs()) ) dyn.unload(libLFile)
-    unlink(libLFile)
+    if ( f %in% names(getLoadedDLLs()) ) dyn.unload(libLFile_orig)
+    unlink(libLFile_orig)
   }
   reg.finalizer(environment(), cleanup, onexit=TRUE)
 
@@ -255,7 +266,7 @@ cfunction <- function(sig=character(), body=character(), includes=character(), o
   remove(list = c("args", "body", "fn", "funCsig", "i", "includes", "j"))
 
   ## RETURN THE FUNCTION
-  if (length(res) == 1 && names(res) == f) return( res[[1]] )
+  if (length(res) == 1 && names(res) == name) return( res[[1]] )
   else return( new( "CFuncList", res ) )
 }
 
@@ -264,29 +275,16 @@ compileCode <- function(f, code, language, verbose) {
   wd = getwd()
   on.exit(setwd(wd))
   ## Prepare temp file names
-  if ( .Platform$OS.type == "windows" ) {
-    ## windows files
-    dir <- gsub("\\\\", "/", tempdir())
-    libCFile  <- paste(dir, "/", f, ".EXT", sep="")
-    libLFile  <- paste(dir, "/", f, ".dll", sep="")
-    libLFile2 <- paste(dir, "/", f, ".dll", sep="")
-  }
-  else {
-    ## UNIX-alike build
-    libCFile  <- paste(tempdir(), "/", f, ".EXT",               sep="")
-    libLFile  <- paste(tempdir(), "/", f, .Platform$dynlib.ext, sep="")
-    libLFile2 <- paste(tempdir(), "/", f, ".sl",                sep="")
-  }
   extension <- switch(language, "C++"=".cpp", C=".c", Fortran=".f", F95=".f95",
                                 ObjectiveC=".m", "ObjectiveC++"=".mm")
-  libCFile <- sub(".EXT$", extension, libCFile)
+  libCFile <- file.path(tempdir(), paste0(f, extension))
+  libLFile <- file.path(tempdir(), paste0(f, .Platform$dynlib.ext))
 
   ## Write the code to the temp file for compilation
   write(code, libCFile)
 
   ## Compile the code using the running version of R if several available
   if ( file.exists(libLFile) ) file.remove( libLFile )
-  if ( file.exists(libLFile2) ) file.remove( libLFile2 )
 
   setwd(dirname(libCFile))
   errfile <- paste( basename(libCFile), ".err.txt", sep = "" )
@@ -297,7 +295,6 @@ compileCode <- function(f, code, language, verbose) {
   errmsg <- readLines( errfile )
   unlink( errfile )
 
-  if ( !file.exists(libLFile) && file.exists(libLFile2) ) libLFile <- libLFile2
   if ( !file.exists(libLFile) ) {
     cat("\nERROR(s) during compilation: source code errors or compiler configuration errors!\n")
     if ( !verbose ) system2(cmd, args = paste(" CMD SHLIB --dry-run --preclean", basename(libCFile)))
