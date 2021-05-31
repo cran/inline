@@ -1,6 +1,6 @@
 Package: inline
-Version: 0.3.18
-Date: 2021-05-17
+Version: 0.3.19
+Date: 2021-05-25
 Title: Functions to Inline C, C++, Fortran Function Calls from R
 Author: Oleg Sklyar, Duncan Murdoch, Mike Smith, Dirk Eddelbuettel, 
  Romain Francois, Karline Soetaert, Johannes Ranke
@@ -17,6 +17,6 @@ URL: https://github.com/eddelbuettel/inline,
         https://dirk.eddelbuettel.com/code/inline.html
 BugReports: https://github.com/eddelbuettel/inline/issues
 NeedsCompilation: no
-Packaged: 2021-05-17 21:54:14 UTC; edd
+Packaged: 2021-05-25 12:45:08 UTC; edd
 Repository: CRAN
-Date/Publication: 2021-05-18 05:30:02 UTC
+Date/Publication: 2021-05-31 08:40:02 UTC

@@ -1,4 +1,4 @@
-b98eb730227918f8b0c2fd74926998f8 *DESCRIPTION
+8e096205390c7a283c1c266834143da6 *DESCRIPTION
 04fb0b89d8e5bfdf5a6a3c8742fbb497 *NAMESPACE
 646c24f533ad74b80c175366fcb49808 *R/cfunction.R
 3661ee24e0f177e278d23dc97797e056 *R/cmethods.R
@@ -7,11 +7,11 @@ aac2d2db93459cdd03d169d8ef50f622 *R/cxxfunction.R
 b060d5e5093bf71dd36ba4ca26001cac *R/package.skeleton.R
 81e1d890da5b85685583318e51823418 *R/utilities.R
 a2ee040ec35c5f7c11ea23c5ed56b1a8 *README.md
-31cdcef5a4f8a36edc4ab50e320f56cd *build/partial.rdb
-c3b751d820d861dc69db5bf432d8400a *inst/NEWS.Rd
-fde8bc34d810722d1394392c5e345488 *inst/tinytest/test_cfunction.R
+1322de0007dfb535d9d63af446efc9c0 *build/partial.rdb
+69cacd38e241c04917b1d64eb030a109 *inst/NEWS.Rd
+bf1cd515f287eaf01bcb5d241f18f0cf *inst/tinytest/test_cfunction.R
 39c248bfe8f8db1ceacb5291ac6c6db3 *inst/tinytest/test_cxxfunction.R
-4763d2f59e9de3595195d0c308677d22 *inst/tinytest/test_utilities.R
+1e3788bc262425b7a03111414b573ecd *inst/tinytest/test_utilities.R
 f763aeb09afa824ff93e53c61b522424 *man/cfunction.Rd
 ff7a3754cb0b9ebf56b01bf7b15720e1 *man/cxxfunction.Rd
 18b89221354bc68a777c5ea418e6efbe *man/getDynLib.Rd
@@ -19,5 +19,5 @@ d29d73247a35885fa13c0fa020866986 *man/inline-package.Rd
 c0c301365881f1f019e9ecae2df2a062 *man/internals.Rd
 dca9bbdf2e3bd0052d048097c715116e *man/package.skeleton.Rd
 04a5e1e601e5da5565578ae818a848f6 *man/plugins.Rd
-8409ec24ccc19dafed4d5baaa2052ab3 *man/utilities.Rd
+fb2e5ce13ad421d014f5132e45ab3a68 *man/utilities.Rd
 46ed7ffcd19192844b681001be5cffcd *tests/tinytest.R
